@@ -4,9 +4,11 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as path from 'path';
 
+const dbPath = path.resolve(process.cwd(), 'db.sqlite');
+
 const AppDataSource = new DataSource({
   type: 'sqlite',
-  database: 'db.sqlite',
+  database: dbPath,
   entities: [Sepomex],
 });
 
