@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sepomex } from 'src/db/entities/sepomex.entity';
 import { Repository } from 'typeorm';
+import { CodigoPostalQueryDto } from './dto/codigo-postal-query.dto';
 
 @Injectable()
 export class CodigoPostalService {
@@ -10,7 +11,15 @@ export class CodigoPostalService {
     private repo: Repository<Sepomex>,
   ) {}
 
-  findByCP(cp: string) {
-    return this.repo.find({ where: { d_codigo: cp } });
+  async findByCP(cp: string, codigoPostalQuery: CodigoPostalQueryDto) {
+    const where: Partial<Sepomex> = { d_codigo: cp };
+    if (codigoPostalQuery.codigoEstado) {
+      where.c_estado = codigoPostalQuery.codigoEstado;
+    }
+    const cps = await this.repo.find({ where });
+    if (cps.length === 0) {
+      throw new NotFoundException('Código postal no encontrado');
+    }
+    return cps;
   }
 }
